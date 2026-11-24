@@ -182,10 +182,10 @@ the rows land in `ledger.csv`.
 Then the counts and the money come from the script, not from arithmetic in prose:
 
 ```bash
-python3 "$RAB" ledger count --dir ./brand-teardown --day0 <day0> --out volume_weekly.csv
-python3 "$RAB" spend  --dir ./brand-teardown --day0 <day0> --budget budget.json --out spend_weekly.csv
-python3 "$RAB" sales  --input ./brand-teardown/sales.json --out sales_channels.csv
-python3 "$RAB" tests  --input ./brand-teardown/tests.json
+python3 "$RAB" ledger count --dir ./brand-teardown --day0 <day0> --out ./brand-teardown/volume_weekly.csv
+python3 "$RAB" spend  --dir ./brand-teardown --day0 <day0> --budget ./brand-teardown/budget.json --out ./brand-teardown/spend_weekly.csv
+python3 "$RAB" sales  --input ./brand-teardown/sales.json --out ./brand-teardown/sales_channels.csv
+python3 "$RAB" tests  --input ./brand-teardown/tests.json --out ./brand-teardown/tests_result.json
 ```
 
 - **Volume per week.** One unit = one ad live that week (counted in every week

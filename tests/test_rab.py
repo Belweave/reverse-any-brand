@@ -356,12 +356,16 @@ class Check(Base):
              "inputs": {"units": 10, "price": 50}, "snapshot_date": "2025-12-01"}]})
         jrun("sales", "--input", self.path("sales.json"), "--out", self.path("sales_channels.csv"))
         self.write("tests.json", {"day0": "2025-11-28", "today": "2025-12-20",
-                                  "verdict": "worked", "final_on": "2025-12-12"})
+                                  "sales": {"holiday_units": 1200, "normal_units": 800},
+                                  "payback": {"sales": {"low": 150000, "mid": 200000, "high": 250000},
+                                              "spend": {"low": 20000, "mid": 30000, "high": 40000}}})
+        jrun("tests", "--input", self.path("tests.json"),
+             "--out", self.path("tests_result.json"))
         self.report("""<!doctype html><html><body>
 <h1 id="hero">Black Friday 2025 marketing teardown: Acme</h1>
 <section id="part-1"><p>Every dollar is an estimate with its range. Not pulled is not zero.</p></section>
 <section id="part-2"><p>Sales</p></section>
-<p id="verdict">Worked</p><img src="images/a.jpg" alt="an ad">
+<p id="verdict">Mixed</p><img src="images/a.jpg" alt="an ad">
 </body></html>""")
 
     def report(self, html):
@@ -425,6 +429,19 @@ class Check(Base):
         p = self.check(ok=False)
         self.assertEqual(p.returncode, 1)
         self.assertIn("range is out of order", p.stdout)
+
+    def test_a_hand_typed_verdict_fails(self):
+        self.write("tests_result.json", {"verdict": "worked"})
+        p = self.check(ok=False)
+        self.assertEqual(p.returncode, 1)
+        self.assertIn("no date it becomes final", p.stdout)
+
+    def test_a_report_that_hides_its_verdict_fails(self):
+        self.report('<h1 id="hero">Acme estimate</h1><p id="verdict">Good campaign</p>'
+                    '<section id="part-1"></section><section id="part-2"></section>')
+        p = self.check(ok=False)
+        self.assertEqual(p.returncode, 1)
+        self.assertIn("does not state the graded verdict", p.stdout)
 
     def test_a_missing_file_fails(self):
         os.remove(self.path("sales_channels.csv"))

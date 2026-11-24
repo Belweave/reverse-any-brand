@@ -119,8 +119,8 @@ bookkeeping. Standard library only, Python 3.9+, no network.
 | `ledger add \| rows \| count` | Dated rows in, units live per week out, with prep start and peak week |
 | `spend` | Estimated spend per week and type, ranges, channels ranked, peak spend week |
 | `sales` | Estimated sales per channel from a stated method, ranges, trust, dupes kept out |
-| `tests` | The six tests, their grades, and the verdict gate |
-| `check` | Pre-publish checks on `report.html` and the CSVs |
+| `tests` | The six tests, their grades, the verdict gate, and the graded result a report must cite |
+| `check` | Pre-publish checks on `report.html` and the CSVs, including that the verdict on the page is the one the script graded |
 | `init` | An empty, correctly headed working folder |
 
 ```bash

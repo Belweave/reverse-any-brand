@@ -837,9 +837,14 @@ def cmd_tests(a):
     text.append("verdict: %s (%s)" % (verdict, why))
     if final_on:
         text.append("final on: %s" % final_on.isoformat())
-    emit({"tests": out, "verdict": verdict, "why": why,
-          "passes": passes, "final_on": final_on.isoformat() if final_on else None},
-         a.json, "\n".join(text))
+    result = {"tests": out, "verdict": verdict, "why": why, "passes": passes,
+              "final_on": final_on.isoformat() if final_on else None,
+              "computed": D.today().isoformat()}
+    if a.out:
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2)
+            f.write("\n")
+    emit(result, a.json, "\n".join(text))
 
 
 # ---------------------------------------------------------------- check
@@ -867,7 +872,7 @@ class Collector(html.parser.HTMLParser):
 
 REQUIRED_IDS = ("hero", "part-1", "part-2", "verdict")
 REQUIRED_FILES = ("report.html", "ledger.csv", "volume_weekly.csv", "spend_weekly.csv",
-                  "sales_channels.csv", "tests.json")
+                  "sales_channels.csv", "tests.json", "tests_result.json")
 
 
 def cmd_check(a):
@@ -944,10 +949,16 @@ def cmd_check(a):
     for r in read_csv(os.path.join(d, "sales_channels.csv")):
         if r.get("include_in_total") == "false" and not r.get("kind"):
             notes.append("row kept out of the total without saying why: %s" % r.get("channel"))
-    # a verdict needs a date it becomes final
-    tests = load_json(os.path.join(d, "tests.json")) if os.path.exists(os.path.join(d, "tests.json")) else {}
-    if tests and not tests.get("final_on") and tests.get("verdict") in ("too early to call", "can't tell yet"):
-        fails.append("an open verdict needs the date it becomes final")
+    # the verdict in the report must be the one this script graded, and it must be dated
+    result_path = os.path.join(d, "tests_result.json")
+    if os.path.exists(result_path):
+        result = load_json(result_path)
+        if result.get("verdict") not in ("worked", "mixed", "didn't work", "too early to call", "can't tell yet"):
+            fails.append("tests_result.json has no usable verdict")
+        if not result.get("final_on"):
+            fails.append("the verdict has no date it becomes final")
+        if result.get("verdict") and result["verdict"].lower() not in body.lower():
+            fails.append("the report does not state the graded verdict (%r)" % result["verdict"])
     status = "FAIL" if fails else "PASS"
     text = [status, "%d checks failed, %d notes" % (len(fails), len(notes))]
     text += ["  fail: " + f for f in fails]
@@ -1086,6 +1097,7 @@ def build_parser():
 
     s = sub.add_parser("tests", help="six tests and the verdict")
     s.add_argument("--input", default="output/tests.json")
+    s.add_argument("--out", default=None)
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_tests)
 
