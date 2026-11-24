@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__/
+*.pyc
+# a teardown's working folder is the user's, not the repo's
+output/
+brand-teardown/

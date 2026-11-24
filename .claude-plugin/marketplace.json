@@ -1,0 +1,14 @@
+{
+  "name": "belweave",
+  "description": "Agent skills from Belweave.",
+  "owner": { "name": "Belweave", "url": "https://github.com/Belweave" },
+  "plugins": [
+    {
+      "name": "reverse-any-brand",
+      "description": "Reverse engineer any brand's marketing: counted timelines, estimated spend and sales, one graded verdict.",
+      "source": "./",
+      "category": "marketing",
+      "tags": ["agents", "marketing", "brand", "teardown", "research"]
+    }
+  ]
+}

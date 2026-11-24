@@ -1,0 +1,10 @@
+{
+  "name": "reverse-any-brand",
+  "version": "1.0.0",
+  "description": "Reverse engineer any brand's marketing: every ad, collab and price move counted, spend and sales estimated with ranges, and one graded verdict in a published report.",
+  "author": { "name": "Belweave", "url": "https://github.com/Belweave" },
+  "homepage": "https://github.com/Belweave/reverse-any-brand",
+  "repository": "https://github.com/Belweave/reverse-any-brand",
+  "license": "MIT",
+  "keywords": ["agents", "skills", "marketing", "brand", "teardown", "competitive-analysis", "ads"]
+}

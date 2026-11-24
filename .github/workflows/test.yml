@@ -1,0 +1,46 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, python: "3.9" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: macos-latest, python: "3.9" }
+          - { os: macos-latest, python: "3.13" }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python3 tests/test_rab.py
+      - name: every skill has frontmatter the skills CLI will accept
+        run: |
+          python3 - <<'PY'
+          import glob, re, sys
+          bad = []
+          for p in glob.glob("skills/*/SKILL.md"):
+              head = open(p, encoding="utf-8").read().split("---")[1]
+              name = re.search(r"^name:\s*(\S+)", head, re.M)
+              desc = re.search(r"^description:\s*(.+)$", head, re.M)
+              if not name or not desc:
+                  bad.append(p + ": missing name or description")
+              elif name.group(1) != p.split("/")[1]:
+                  bad.append(p + ": name does not match its folder")
+          print("\n".join(bad) or "ok")
+          sys.exit(1 if bad else 0)
+          PY
